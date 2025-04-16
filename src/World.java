@@ -27,6 +27,7 @@ public class World extends JPanel {
         this.tiles = new Tile[cellsX][cellsY];
 
         NoiseMapGenerator noiseMapGenerator = new NoiseMapGenerator(cellsX+1, cellsY+1);
+        Random rand = new Random();
 
         for (int x = 0; x < cellsX; x++) {
             for (int y = 0; y < cellsY; y++) {
@@ -34,40 +35,20 @@ public class World extends JPanel {
             }
         }
 
-        double[][] noiseMap = noiseMapGenerator.generateNoiseMap(0, 10, 4, 0.5, 0.5 );
-        for (int x = 0; x < cellsX + 1; x++) {
-            for (int y = 0; y < cellsY + 1; y++) {
-                noiseMap[x][y] = bound(noiseMap[x][y]);
+        double[][] noiseMap = noiseMapGenerator.generateNoiseMap(0, 8, 4, 0.5, 0.5);
+        for (int x = 0; x < cellsX+1; x++) {
+            for (int y = 0; y < cellsY+1; y++) {
+                double noise = noiseMap[x][y];
+                if (noise > 0.7) { noiseMap[x][y] = SPRITEGROUP.SHALLOW.ordinal(); continue; }
+                if (noise > 0.5) { noiseMap[x][y] = SPRITEGROUP.BEACH.ordinal(); continue; }
+                noiseMap[x][y] = SPRITEGROUP.GRASS.ordinal();
             }
         }
-
         for (int x = 0; x < cellsX; x++) {
             for (int y = 0; y < cellsY; y++) {
-                SPRITE s = SPRITE.fromEdges(getCorners(x, y, noiseMap), random);
+                SPRITEGROUP[] corners = getCorners(x,y, noiseMap);
+                SPRITE s = SPRITE.fromEdges(corners, rand);
                 tiles[x][y].setSprite(s);
-            }
-        }
-
-        double[][] noiseMapD = noiseMapGenerator.generateNoiseMap(1, 10, 4, 0.5, 0.5 );
-        for (int x = 0; x < cellsX; x++) {
-            for (int y = 0; y < cellsY; y++) {
-                noiseMapD[x][y] = noiseMapD[x][y] > 0.7 ?  SPRITEGROUP.DESERT.ordinal() : -1;
-            }
-        }
-
-        double[][] topMap = noiseMapGenerator.generateNoiseMap(0, 8, 4, 0.4, 0.5);
-        for (int x = 0; x < cellsX + 1; x++) {
-            for (int y = 0; y < cellsY + 1; y++) {
-                topMap[x][y] = boundTopMap(topMap[x][y]);
-            }
-        }
-
-        conflateWithBoundary(topMap, SPRITEGROUP.AIR, SPRITEGROUP.GRASS);
-
-        for (int x = 0; x < cellsX-1; x++) {
-            for (int y = 0; y < cellsY-1; y++) {
-                SPRITE s = SPRITE.fromEdges(getCorners(x,y, topMap), random);
-                tiles[x][y].setTopSprite(s);
             }
         }
     }
@@ -80,46 +61,6 @@ public class World extends JPanel {
                 SPRITEGROUP.values()[(int)noiseMap[x+1][y+1]]
         };
         return corners;
-    }
-
-    private void conflateWithBoundary(double[][] map, SPRITEGROUP nullGroup ,SPRITEGROUP testGroup) {
-        for (int x = 0; x < cellsX-1; x++) {
-            for (int y = 0; y < cellsY - 1; y++) {
-                if (x == 0 || y == 0) {
-                    map[x][y] = nullGroup.ordinal();
-                    continue;
-                }
-
-                map[x][y] =
-                        map[x][y] != 0 &&
-                                tiles[x][y].getSprite().getGroup() == testGroup &&
-                                tiles[x][y + 1].getSprite().getGroup() == testGroup &&
-                                tiles[x + 1][y + 1].getSprite().getGroup() == testGroup &&
-                                tiles[x + 1][y].getSprite().getGroup() == testGroup &&
-                                tiles[x + 1][y - 1].getSprite().getGroup() == testGroup &&
-                                tiles[x][y - 1].getSprite().getGroup() == testGroup &&
-                                tiles[x - 1][y - 1].getSprite().getGroup() == testGroup &&
-                                tiles[x - 1][y].getSprite().getGroup() == testGroup &&
-                                tiles[x - 1][y + 1].getSprite().getGroup() == testGroup
-                                ? map[x][y] : nullGroup.ordinal();
-            }
-        }
-    }
-
-    private double bound(double v) {
-        if (v < 0.2) { return SPRITEGROUP.DEEPWATER.ordinal(); }
-        if (v < 0.35) { return SPRITEGROUP.WATER.ordinal(); }
-        if (v > 0.8) { return SPRITEGROUP.ROCK.ordinal(); }
-        return SPRITEGROUP.GRASS.ordinal();
-    }
-
-    private double boundTopMap(double v) {
-        if (v > 0.7) {
-            return SPRITEGROUP.TREE.ordinal();
-        } else if (v < 0.3) {
-            return SPRITEGROUP.TREE_1.ordinal();
-        }
-        return SPRITEGROUP.AIR.ordinal();
     }
 
     public int getPixelHeight() {

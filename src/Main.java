@@ -9,10 +9,10 @@ import javax.swing.JPanel;
 public class Main {
     public static void main(String[] args) {
         World world = new World(
-                new SpriteSheet("assets/punyworld-overworld-tileset.png", 27, 65, 16),
-                1900/8,
-                1000/8,
-                8
+                new SpriteSheet("assets/SheetMaster.png", 12, 12, 16),
+                1900/32,
+                1000/32,
+                32
         );
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

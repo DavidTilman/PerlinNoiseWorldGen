@@ -1,10 +1,5 @@
 public enum SPRITEGROUP {
     GRASS,
-    ROCK,
-    WATER,
-    DEEPWATER,
-    AIR,
-    TREE,
-    TREE_1,
-    DESERT
+    BEACH,
+    SHALLOW
 }
