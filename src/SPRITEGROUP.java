@@ -5,5 +5,6 @@ public enum SPRITEGROUP {
     DEEPWATER,
     AIR,
     TREE,
-    TREE_1
+    TREE_1,
+    DESERT
 }

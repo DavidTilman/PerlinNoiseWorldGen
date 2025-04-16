@@ -10,9 +10,9 @@ public class Main {
     public static void main(String[] args) {
         World world = new World(
                 new SpriteSheet("assets/punyworld-overworld-tileset.png", 27, 65, 16),
-                1900/16,
-                1000/16,
-                16
+                1900/8,
+                1000/8,
+                8
         );
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
